@@ -1,13 +1,15 @@
 package com.app.backend.domain.user.service;
 
-import com.app.backend.domain.user.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import com.app.backend.domain.user.dto.request.CreateUserLocalDto;
 
-@Service
-@RequiredArgsConstructor
-public class UserService {
+public interface UserService {
 
-    private final UserRepository userRepository;
+	/**
+	 * 회원가입시 유저 정보를 저장하는 메서드
+	 *
+	 * @param {@link CreateUserLocalDto}
+	 * @return 유저 고유 ID
+	 */
+	long createUser(final CreateUserLocalDto requestDto);
 
 }
