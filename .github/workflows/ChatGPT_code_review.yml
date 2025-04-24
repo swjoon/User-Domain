@@ -1,0 +1,21 @@
+name: Code Review From ChatGPT
+
+permissions:
+  contents: read
+  pull-requests: write
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  code-review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: anc95/ChatGPT-CodeReview@main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          LANGUAGE: Korean
+          MODEL: gpt-3.5-turbo
+          PROMPT: "코드의 개선사항, 잠재적 버그 및 클린 코드 원칙을 중심으로 리뷰해주세요. 개선이 필요한 부분이나 성능 최적화, 가독성 향상 등 구체적인 피드백을 제공해 주세요. 피드백이 필요없는 부분은 제공 안해줘도 됩니다."
