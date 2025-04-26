@@ -1,0 +1,6 @@
+#JWT config
+jwt:
+  secret: abcdefghijkl1234567890
+  token:
+    access-expiration: 100000
+    refresh-expiration: 1000000000

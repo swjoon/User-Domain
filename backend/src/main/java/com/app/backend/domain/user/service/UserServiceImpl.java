@@ -1,6 +1,6 @@
 package com.app.backend.domain.user.service;
 
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,14 +16,14 @@ public class UserServiceImpl implements UserService {
 
 	private final UserRepository userRepository;
 
-	private final BCryptPasswordEncoder bCryptPasswordEncoder;
+	private final PasswordEncoder passwordEncoder;
 
 	@Override
 	@Transactional
 	public long createUser(final CreateUserLocalDto createUserLocalDto) {
 
 		User user = CreateUserLocalDto
-			.toEntity(createUserLocalDto, bCryptPasswordEncoder.encode(createUserLocalDto.getPassword()));
+			.toEntity(createUserLocalDto, passwordEncoder.encode(createUserLocalDto.getPassword()));
 
 		return userRepository.createUser(user).getId();
 	}

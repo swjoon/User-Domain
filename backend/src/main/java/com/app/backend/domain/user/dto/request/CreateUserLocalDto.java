@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 public class CreateUserLocalDto {
 
 	@NotBlank
-	@Size(min = 6, max = 20)
+	@Size(min = 5, max = 20)
 	@Pattern(regexp = "^[^\\s]+$", message = "공백 없이 입력해주세요.")
 	private String username;
 
