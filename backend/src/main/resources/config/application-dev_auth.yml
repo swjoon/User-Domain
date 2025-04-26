@@ -1,4 +1,4 @@
-#spring:
+spring:
 #  security:
 #    oauth2:
 #      client:
@@ -43,14 +43,9 @@
 #            user-name-attribute: response.id
 
 #JWT config
-#jwt:
-#  secret: JWT_SECRET
-#  issuer: JWT_ISSUER
-#  token:
-#    access-expiration: 1800000
-#    refresh_expiration: 604800000
-#
-##Kakao API
-#kakao:
-#  rest-api:
-#    key: ${KAKAO_REST_API_KEY}
+jwt:
+  secret: ${JWT_SECRET}
+  token:
+    access-expiration: ${JWT_ACCESS_EXPIRATION}
+    refresh-expiration: ${JWT_refresh_EXPIRATION}
+
