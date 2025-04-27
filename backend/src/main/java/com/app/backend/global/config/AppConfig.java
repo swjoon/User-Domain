@@ -1,4 +1,4 @@
-package com.app.backend.global.config.security;
+package com.app.backend.global.config;
 
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
