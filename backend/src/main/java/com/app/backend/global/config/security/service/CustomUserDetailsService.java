@@ -1,4 +1,4 @@
-package com.app.backend.global.config.security.user;
+package com.app.backend.global.config.security.service;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -9,6 +9,7 @@ import com.app.backend.domain.user.entity.User;
 import com.app.backend.domain.user.exception.UserErrorCode;
 import com.app.backend.domain.user.exception.UserException;
 import com.app.backend.domain.user.repository.UserRepository;
+import com.app.backend.global.config.security.info.CustomUserDetails;
 
 import lombok.RequiredArgsConstructor;
 
