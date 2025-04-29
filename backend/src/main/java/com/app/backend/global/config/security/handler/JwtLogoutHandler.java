@@ -22,7 +22,6 @@ import lombok.extern.slf4j.Slf4j;
 public class JwtLogoutHandler implements LogoutHandler {
 
 	private final JwtProvider jwtProvider;
-	private final CookieProvider cookieProvider;
 	private final RedisTemplate<String, Object> redisTemplate;
 
 	@Override
@@ -44,7 +43,7 @@ public class JwtLogoutHandler implements LogoutHandler {
 			} catch (Exception e) {
 				log.debug(e.getMessage());
 			} finally {
-				cookieProvider.expireRefreshTokenCookie(response);
+				CookieProvider.expireRefreshTokenCookie(response);
 			}
 		}
 	}
