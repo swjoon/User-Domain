@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
+import com.app.backend.domain.user.entity.Provider;
 import com.app.backend.domain.user.entity.User;
 
 import lombok.RequiredArgsConstructor;
@@ -31,4 +32,11 @@ public class UserRepositoryImpl implements UserRepository {
 
 		return userJpaRepository.findByUsername(username);
 	}
+
+	@Override
+	public Optional<User> findByProviderAndProviderId(final Provider provider, final String providerId) {
+
+		return userJpaRepository.findByProviderAndProviderId(provider, providerId);
+	}
+
 }

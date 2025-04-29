@@ -2,6 +2,7 @@ package com.app.backend.domain.user.repository;
 
 import java.util.Optional;
 
+import com.app.backend.domain.user.entity.Provider;
 import com.app.backend.domain.user.entity.User;
 
 public interface UserRepository {
@@ -29,4 +30,12 @@ public interface UserRepository {
 	 */
 	Optional<User> findByUsername(final String username);
 
+	/**
+	 * OAuth2 식별자와 ID로 일치하는 정보 조회 메서드
+	 *
+	 * @param provider 식별자
+	 * @param providerId 소설 제공 ID
+	 * @return {@link User}
+	 */
+	Optional<User> findByProviderAndProviderId(final Provider provider, final String providerId);
 }

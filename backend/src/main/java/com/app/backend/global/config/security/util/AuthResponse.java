@@ -11,7 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 public class AuthResponse {
 
-	public static void success(
+	public static void successLogin(
 		final HttpServletResponse response,
 		final String accessToken,
 		final Cookie cookie,
@@ -34,7 +34,7 @@ public class AuthResponse {
 		defaultResponse(response, apiResponse, status, om);
 	}
 
-	private static void defaultResponse(
+	public static void defaultResponse(
 		final HttpServletResponse response,
 		final ApiResponse<?> apiResponse,
 		final int status,

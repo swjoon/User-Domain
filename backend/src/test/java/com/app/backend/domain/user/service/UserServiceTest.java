@@ -51,7 +51,7 @@ public class UserServiceTest extends SpringbootTestUtil {
 		User user = em.find(User.class, userId);
 
 		assertThat(user.getUsername()).isEqualTo(requestDto.getUsername());
-		assertThat(bCryptPasswordEncoder.matches(requestDto.getPassword(), user.getPassword())).isTrue();
+		assertThat(passwordEncoder.matches(requestDto.getPassword(), user.getPassword())).isTrue();
 		assertThat(user.getName()).isEqualTo(requestDto.getName());
 		assertThat(user.getEmail()).isEqualTo(requestDto.getEmail());
 		assertThat(user.getPhone()).isEqualTo(requestDto.getPhone());

@@ -1,16 +1,13 @@
 package com.app.backend.global.config.security.util;
 
-import org.springframework.stereotype.Component;
-
 import com.app.backend.global.config.security.constant.AuthConstant;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 
-@Component
 public class CookieProvider {
 
-	public Cookie createRefreshTokenCookie(final String refreshToken, final long expiration) {
+	public static Cookie createRefreshTokenCookie(final String refreshToken, final long expiration) {
 		Cookie cookie = new Cookie(AuthConstant.REFRESH_TOKEN, refreshToken);
 		cookie.setHttpOnly(true);
 		cookie.setSecure(true);
@@ -19,7 +16,7 @@ public class CookieProvider {
 		return cookie;
 	}
 
-	public void expireRefreshTokenCookie(HttpServletResponse response) {
+	public static void expireRefreshTokenCookie(HttpServletResponse response) {
 		Cookie cookie = new Cookie(AuthConstant.REFRESH_TOKEN, null);
 		cookie.setMaxAge(0);
 		cookie.setHttpOnly(true);

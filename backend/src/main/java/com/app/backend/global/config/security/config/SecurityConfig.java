@@ -19,9 +19,11 @@ import com.app.backend.global.config.security.filter.JwtAuthenticationFilter;
 import com.app.backend.global.config.security.filter.JwtAuthorizationFilter;
 import com.app.backend.global.config.security.handler.CustomAccessDeniedHandler;
 import com.app.backend.global.config.security.handler.CustomAuthenticationEntryPoint;
+import com.app.backend.global.config.security.handler.CustomOAuth2FailureHandler;
+import com.app.backend.global.config.security.handler.CustomOAuth2SuccessHandler;
 import com.app.backend.global.config.security.handler.JwtLogoutHandler;
 import com.app.backend.global.config.security.handler.JwtLogoutSuccessHandler;
-import com.app.backend.global.config.security.util.CookieProvider;
+import com.app.backend.global.config.security.service.CustomOAuth2UserService;
 import com.app.backend.global.config.security.util.JwtProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -39,12 +41,15 @@ public class SecurityConfig {
 
 	private final JwtConfig jwtConfig;
 	private final JwtProvider jwtProvider;
-	private final CookieProvider cookieProvider;
 
 	private final JwtLogoutHandler jwtLogoutHandler;
 	private final JwtLogoutSuccessHandler jwtLogoutSuccessHandler;
-	private final CustomAuthenticationEntryPoint authenticationEntryPoint;
-	private final CustomAccessDeniedHandler accessDeniedHandler;
+	private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+	private final CustomAccessDeniedHandler customAccessDeniedHandler;
+	private final CustomOAuth2SuccessHandler customOAuth2SuccessHandler;
+	private final CustomOAuth2FailureHandler customOAuth2FailureHandler;
+
+	private final CustomOAuth2UserService customOAuth2UserService;
 
 	private final UrlBasedCorsConfigurationSource corsConfigurationSource;
 
@@ -56,7 +61,6 @@ public class SecurityConfig {
 		JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(
 			jwtConfig,
 			jwtProvider,
-			cookieProvider,
 			objectMapper,
 			redisTemplate,
 			authenticationManager(configuration),
@@ -69,7 +73,6 @@ public class SecurityConfig {
 		JwtAuthorizationFilter jwtAuthorizationFilter = new JwtAuthorizationFilter(
 			jwtConfig,
 			jwtProvider,
-			cookieProvider,
 			objectMapper,
 			redisTemplate
 		);
@@ -79,23 +82,31 @@ public class SecurityConfig {
 			.csrf(AbstractHttpConfigurer::disable)
 			.cors(cors -> cors.configurationSource(corsConfigurationSource))
 
-			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-
 			.authorizeHttpRequests(auth -> auth
 				.requestMatchers(
 					"/h2-console/**",
 					"/api/v1/users/signup",
-					"/oauth2/**").permitAll()
+					"/oauth2/**",
+					"/login/oauth2/**")
+				.permitAll()
 
 				.anyRequest().authenticated()
 			)
+
+			.oauth2Login(oauth2 -> oauth2
+				.successHandler(customOAuth2SuccessHandler)
+				.failureHandler(customOAuth2FailureHandler)
+				.userInfoEndpoint(info -> info.userService(customOAuth2UserService))
+			)
+
+			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
 			.addFilterAt(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
 			.addFilterBefore(jwtAuthorizationFilter, JwtAuthenticationFilter.class)
 
 			.exceptionHandling(ex -> ex
-				.authenticationEntryPoint(authenticationEntryPoint)
-				.accessDeniedHandler(accessDeniedHandler)
+				.authenticationEntryPoint(customAuthenticationEntryPoint)
+				.accessDeniedHandler(customAccessDeniedHandler)
 			)
 
 			.logout(logout -> logout

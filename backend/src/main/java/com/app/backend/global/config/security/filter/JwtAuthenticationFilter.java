@@ -16,7 +16,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import com.app.backend.domain.user.exception.UserException;
 import com.app.backend.global.config.security.config.JwtConfig;
 import com.app.backend.global.config.security.dto.request.LoginUserDto;
-import com.app.backend.global.config.security.user.CustomUserDetails;
+import com.app.backend.global.config.security.info.CustomUserDetails;
 import com.app.backend.global.config.security.util.AuthResponse;
 import com.app.backend.global.config.security.util.CookieProvider;
 import com.app.backend.global.config.security.util.JwtProvider;
@@ -36,7 +36,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
 	private final JwtConfig jwtConfig;
 	private final JwtProvider jwtProvider;
-	private final CookieProvider cookieProvider;
 	private final ObjectMapper objectMapper;
 	private final RedisTemplate<String, Object> redisTemplate;
 	private final AuthenticationManager authenticationManager;
@@ -89,10 +88,10 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 			TimeUnit.MILLISECONDS
 		);
 
-		AuthResponse.success(
+		AuthResponse.successLogin(
 			response,
 			accessToken,
-			cookieProvider.createRefreshTokenCookie(refreshToken, jwtConfig.getREFRESH_EXPIRATION()),
+			CookieProvider.createRefreshTokenCookie(refreshToken, jwtConfig.getREFRESH_EXPIRATION()),
 			HttpStatus.OK.value(),
 			ApiResponse.of(true, HttpStatus.OK, "로그인 성공"),
 			objectMapper);
