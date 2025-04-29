@@ -13,7 +13,7 @@ import com.app.backend.domain.user.entity.Role;
 import com.app.backend.domain.user.entity.User;
 import com.app.backend.global.config.security.config.JwtConfig;
 import com.app.backend.global.config.security.constant.AuthConstant;
-import com.app.backend.global.config.security.user.CustomUserDetails;
+import com.app.backend.global.config.security.info.CustomUserDetails;
 import com.app.backend.global.config.security.util.AuthResponse;
 import com.app.backend.global.config.security.util.CookieProvider;
 import com.app.backend.global.config.security.util.JwtProvider;
@@ -35,9 +35,14 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
 	private final JwtConfig jwtConfig;
 	private final JwtProvider jwtProvider;
-	private final CookieProvider cookieProvider;
 	private final ObjectMapper objectMapper;
 	private final RedisTemplate<String, Object> redisTemplate;
+
+	@Override
+	protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+		String path = request.getRequestURI();
+		return path.startsWith("/oauth2/") || path.startsWith("/login/oauth2/");
+	}
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -161,7 +166,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 		SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
 		response.setHeader(AuthConstant.AUTHENTICATION, newAccessToken);
-		response.addCookie(cookieProvider.createRefreshTokenCookie(newRefreshToken, jwtConfig.getREFRESH_EXPIRATION()));
+		response.addCookie(CookieProvider.createRefreshTokenCookie(newRefreshToken, jwtConfig.getREFRESH_EXPIRATION()));
 
 		filterChain.doFilter(request, response);
 	}
