@@ -58,7 +58,7 @@ public class User extends BaseEntity {
 
 	@Builder.Default
 	@Enumerated(EnumType.STRING)
-	private SocialType socialType = SocialType.LOCAL;
+	private Provider provider = Provider.LOCAL;
 
 	private String providerId;
 
