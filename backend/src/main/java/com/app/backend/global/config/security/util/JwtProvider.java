@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 
 import com.app.backend.global.config.security.config.JwtConfig;
 import com.app.backend.global.config.security.constant.AuthConstant;
-import com.app.backend.global.config.security.user.CustomUserDetails;
+import com.app.backend.global.config.security.info.CustomUserDetails;
 
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.Cookie;
@@ -79,9 +79,9 @@ public class JwtProvider {
 
 		return "Bearer " + Jwts.builder()
 			.claim("subject", "access")
-			.claim("id", customUserDetails.getUser().getId())
+			.claim("id", customUserDetails.getUserId())
 			.claim("username", customUserDetails.getUsername())
-			.claim("role", customUserDetails.getUser().getRole())
+			.claim("role", customUserDetails.getRole())
 			.issuedAt(new Date(currentTime))
 			.expiration(new Date(currentTime + expiration))
 			.signWith(secretKey)
@@ -93,9 +93,9 @@ public class JwtProvider {
 
 		return Jwts.builder()
 			.claim("subject", "refresh")
-			.claim("id", customUserDetails.getUser().getId())
+			.claim("id", customUserDetails.getUserId())
 			.claim("username", customUserDetails.getUsername())
-			.claim("role", customUserDetails.getUser().getRole())
+			.claim("role", customUserDetails.getRole())
 			.issuedAt(new Date(currentTime))
 			.expiration(new Date(currentTime + expiration))
 			.signWith(secretKey)
