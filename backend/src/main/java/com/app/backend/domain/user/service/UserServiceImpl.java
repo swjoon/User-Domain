@@ -60,7 +60,7 @@ public class UserServiceImpl implements UserService {
 	 * @return {@link OAuth2ProviderInfo}
 	 */
 	private OAuth2ProviderInfo getProviderInfo(final CreateUserOauth2Dto requestDto) {
-		String uuid = requestDto.getUUID();
+		String uuid = requestDto.getUuid();
 
 		Object info = redisTemplate.opsForValue().get(uuid);
 

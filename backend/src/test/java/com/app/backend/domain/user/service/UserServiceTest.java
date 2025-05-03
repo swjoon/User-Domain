@@ -93,7 +93,7 @@ public class UserServiceTest extends SpringbootTestUtil {
 			.giveMeBuilder(CreateUserOauth2Dto.class)
 			.set("nickName", "test name")
 			.set("phoneNumber", "01012345678")
-			.set("UUID", UUID)
+			.set("uuid", UUID)
 			.sample();
 
 		// When
@@ -136,7 +136,7 @@ public class UserServiceTest extends SpringbootTestUtil {
 			.giveMeBuilder(CreateUserOauth2Dto.class)
 			.set("nickName", "test name")
 			.set("phoneNumber", null)
-			.set("UUID", UUID)
+			.set("uuid", UUID)
 			.sample();
 
 		// When
@@ -182,7 +182,7 @@ public class UserServiceTest extends SpringbootTestUtil {
 			.giveMeBuilder(CreateUserOauth2Dto.class)
 			.set("nickName", "test name")
 			.set("phoneNumber", "01012345678")
-			.set("UUID", UUID)
+			.set("uuid", UUID)
 			.sample();
 
 		// When
@@ -207,7 +207,7 @@ public class UserServiceTest extends SpringbootTestUtil {
 			.giveMeBuilder(CreateUserOauth2Dto.class)
 			.set("nickName", "test name")
 			.set("phoneNumber", "01012345678")
-			.set("UUID", UUID)
+			.set("uuid", UUID)
 			.sample();
 
 		// When & Then
@@ -239,7 +239,7 @@ public class UserServiceTest extends SpringbootTestUtil {
 			.giveMeBuilder(CreateUserOauth2Dto.class)
 			.set("nickName", "test name")
 			.set("phoneNumber", null)
-			.set("UUID", UUID)
+			.set("uuid", UUID)
 			.sample();
 
 		// When & Then

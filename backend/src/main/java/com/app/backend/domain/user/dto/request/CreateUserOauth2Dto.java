@@ -40,5 +40,5 @@ public class CreateUserOauth2Dto {
 	private String detailAddress;
 
 	@NotBlank
-	private String UUID;
+	private String uuid;
 }
