@@ -2,6 +2,7 @@ package com.app.backend.global.config.security.info.domain;
 
 import java.util.Map;
 
+import com.app.backend.global.config.security.constant.AuthConstant;
 import com.app.backend.global.config.security.info.OAuth2UserInfo;
 
 public class NaverOAuth2UserInfo implements OAuth2UserInfo {
@@ -14,7 +15,7 @@ public class NaverOAuth2UserInfo implements OAuth2UserInfo {
 
 	@Override
 	public String getProvider() {
-		return "naver";
+		return AuthConstant.NAVER;
 	}
 
 	@Override

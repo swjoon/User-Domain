@@ -8,6 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.stereotype.Component;
 
+import com.app.backend.global.config.security.constant.AuthConstant;
 import com.app.backend.global.config.security.util.CookieProvider;
 import com.app.backend.global.config.security.util.JwtProvider;
 
@@ -34,12 +35,13 @@ public class JwtLogoutHandler implements LogoutHandler {
 		if (authorization != null && refreshToken != null) {
 			accessToken = authorization.substring(7);
 			try {
+				Long userId = jwtProvider.getUserId(accessToken);
 				String username = jwtProvider.getUsername(accessToken);
 				Date expiration = jwtProvider.getExpirationDate(accessToken);
 				long duration = expiration.getTime() - System.currentTimeMillis();
 
 				redisTemplate.opsForValue().set(accessToken, "Logout", duration, TimeUnit.MILLISECONDS);
-				redisTemplate.delete(username);
+				redisTemplate.delete(AuthConstant.REDIS_TOKEN_PREFIX + userId);
 			} catch (Exception e) {
 				log.debug(e.getMessage());
 			} finally {

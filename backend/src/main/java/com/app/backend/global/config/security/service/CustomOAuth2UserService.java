@@ -24,6 +24,7 @@ import com.app.backend.global.config.security.info.OAuth2UserInfo;
 import com.app.backend.global.config.security.info.domain.GoogleOAuth2UserInfo;
 import com.app.backend.global.config.security.info.domain.KakaoOAuth2UserInfo;
 import com.app.backend.global.config.security.info.domain.NaverOAuth2UserInfo;
+import com.app.backend.global.config.security.info.domain.OAuth2ProviderInfo;
 import com.app.backend.global.util.UuidUtil;
 
 import lombok.RequiredArgsConstructor;
@@ -56,8 +57,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 	}
 
 	private OAuth2User process(final OAuth2UserInfo userInfo) {
-		log.debug("userInfo : {}", userInfo.toString());
-
 		Provider provider = getProvider(userInfo.getProvider());
 		String providerId = userInfo.getProviderId();
 
@@ -69,7 +68,11 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
 		String uuid = UuidUtil.getUuid(LocalDate.now().toString(), 7);
 
-		redisTemplate.opsForValue().set(uuid, userInfo, 5, TimeUnit.MINUTES);
+		OAuth2ProviderInfo info = OAuth2ProviderInfo.from(userInfo);
+
+		log.debug("userInfo : {}", info.toString());
+
+		redisTemplate.opsForValue().set(uuid, info, 5, TimeUnit.MINUTES);
 
 		log.debug("추가 회원정보 uuid: {}, provider: {}", uuid, provider);
 
