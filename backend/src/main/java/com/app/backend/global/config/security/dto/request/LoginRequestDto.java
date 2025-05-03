@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class LoginUserDto {
+public class LoginRequestDto {
 
 	@NotBlank
 	private String username;

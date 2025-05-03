@@ -49,15 +49,27 @@ public class CreateUserLocalDto {
 	@NotNull
 	private LocalDate birthDate;
 
-	public static User toEntity(final CreateUserLocalDto createUserDto, final String encodedPassword) {
+	@NotBlank
+	private String zipCode;
+
+	@NotBlank
+	private String address;
+
+	@NotBlank
+	private String detailAddress;
+
+	public static User toEntity(final CreateUserLocalDto dto, final String encodedPassword) {
 		return User.builder()
-			.username(createUserDto.getUsername())
+			.username(dto.getUsername())
 			.password(encodedPassword)
-			.email(createUserDto.getEmail())
-			.name(createUserDto.getName())
-			.phone(createUserDto.getPhone())
-			.gender(createUserDto.getGender())
-			.birthDate(createUserDto.getBirthDate())
+			.email(dto.getEmail())
+			.name(dto.getName())
+			.phone(dto.getPhone())
+			.gender(dto.getGender())
+			.birthDate(dto.getBirthDate())
+			.zipCode(dto.getZipCode())
+			.address(dto.getAddress())
+			.detailAddress(dto.getDetailAddress())
 			.build();
 	}
 }
