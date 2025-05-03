@@ -58,7 +58,7 @@ spring:
             user-name-attribute: id
 
 jwt:
-  secret: abcdefghijkl1234567890
+  secret: abcdefghijkl1234567890abcdefghijkl1234567890abcdefghijkl1234567890
   token:
     access-expiration: 100000
     refresh-expiration: 1000000000
