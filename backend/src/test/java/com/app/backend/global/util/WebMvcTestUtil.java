@@ -7,9 +7,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.app.backend.domain.user.controller.UserController;
-import com.app.backend.domain.user.service.UserService;
-import com.app.backend.global.config.security.service.auth.AuthService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.persistence.EntityManager;
