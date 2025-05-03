@@ -65,8 +65,8 @@ public class AuthServiceImpl implements AuthService {
 				response,
 				accessToken,
 				cookie,
-				HttpStatus.OK.value(),
-				ApiResponse.of(true, HttpStatus.OK, "OAuth2 회원가입을 완료했습니다.", responseDto),
+				HttpStatus.CREATED.value(),
+				ApiResponse.of(true, HttpStatus.CREATED, "OAuth2 회원가입을 완료했습니다.", responseDto),
 				objectMapper
 			);
 		} catch (UserException e) {
