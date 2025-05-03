@@ -2,6 +2,7 @@ package com.app.backend.global.util;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -19,6 +20,9 @@ public abstract class SpringbootTestUtil {
 
 	@Autowired
 	protected EntityManager em;
+
+	@Autowired
+	protected RedisTemplate<String, Object> redisTemplate;
 
 	@Autowired
 	protected UserService userService;
