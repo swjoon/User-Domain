@@ -85,7 +85,7 @@ public class SecurityConfig {
 			.authorizeHttpRequests(auth -> auth
 				.requestMatchers(
 					"/h2-console/**",
-					"/api/v1/users/signup",
+					"/api/v1/users/signup/**",
 					"/oauth2/**",
 					"/login/oauth2/**")
 				.permitAll()

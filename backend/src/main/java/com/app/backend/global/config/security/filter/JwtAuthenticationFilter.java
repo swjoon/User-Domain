@@ -15,7 +15,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.app.backend.domain.user.exception.UserException;
 import com.app.backend.global.config.security.config.JwtConfig;
-import com.app.backend.global.config.security.dto.request.LoginUserDto;
+import com.app.backend.global.config.security.constant.AuthConstant;
+import com.app.backend.global.config.security.dto.request.LoginRequestDto;
 import com.app.backend.global.config.security.info.CustomUserDetails;
 import com.app.backend.global.config.security.util.AuthResponse;
 import com.app.backend.global.config.security.util.CookieProvider;
@@ -46,7 +47,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 		throws AuthenticationException {
 
 		try {
-			LoginUserDto loginRequest = objectMapper.readValue(request.getInputStream(), LoginUserDto.class);
+			LoginRequestDto loginRequest = objectMapper.readValue(request.getInputStream(), LoginRequestDto.class);
 
 			validateDto(loginRequest);
 
@@ -80,9 +81,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 		String accessToken = jwtProvider.createAccessToken(userDetails, jwtConfig.getACCESS_EXPIRATION());
 		String refreshToken = jwtProvider.createRefreshToken(userDetails, jwtConfig.getREFRESH_EXPIRATION());
 
-		redisTemplate.delete(userDetails.getUsername());
+		redisTemplate.delete(AuthConstant.REDIS_TOKEN_PREFIX + userDetails.getUserId());
 		redisTemplate.opsForValue().set(
-			userDetails.getUsername(),
+			AuthConstant.REDIS_TOKEN_PREFIX + userDetails.getUserId(),
 			refreshToken,
 			jwtConfig.getREFRESH_EXPIRATION(),
 			TimeUnit.MILLISECONDS
@@ -97,8 +98,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 			objectMapper);
 	}
 
-	private void validateDto(LoginUserDto loginRequest) throws IOException {
-		Set<ConstraintViolation<LoginUserDto>> violations = validator.validate(loginRequest);
+	private void validateDto(LoginRequestDto loginRequest) throws IOException {
+		Set<ConstraintViolation<LoginRequestDto>> violations = validator.validate(loginRequest);
 
 		if (!violations.isEmpty()) {
 			throw new UserException(GlobalErrorCode.INVALID_INPUT_VALUE);

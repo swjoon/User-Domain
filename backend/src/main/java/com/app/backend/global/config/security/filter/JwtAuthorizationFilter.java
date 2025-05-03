@@ -128,7 +128,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 		String username = jwtProvider.getUsername(refreshToken);
 		String role = jwtProvider.getRole(refreshToken);
 
-		Object savedRefreshToken = redisTemplate.opsForValue().get(username);
+		Object savedRefreshToken = redisTemplate.opsForValue().get(AuthConstant.REDIS_TOKEN_PREFIX + id);
 
 		if (savedRefreshToken == null || !savedRefreshToken.toString().equals(refreshToken)) {
 			log.debug("유효하지 않은 RefreshToken");
@@ -152,9 +152,9 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 		String newAccessToken = jwtProvider.createAccessToken(userDetails, jwtConfig.getACCESS_EXPIRATION());
 		String newRefreshToken = jwtProvider.createRefreshToken(userDetails, jwtConfig.getREFRESH_EXPIRATION());
 
-		redisTemplate.delete(userDetails.getUsername());
+		redisTemplate.delete(AuthConstant.REDIS_TOKEN_PREFIX + userDetails.getUserId());
 		redisTemplate.opsForValue().set(
-			userDetails.getUsername(),
+			AuthConstant.REDIS_TOKEN_PREFIX + userDetails.getUserId(),
 			newRefreshToken,
 			jwtConfig.getREFRESH_EXPIRATION(),
 			TimeUnit.MILLISECONDS

@@ -10,6 +10,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component;
 
 import com.app.backend.global.config.security.config.JwtConfig;
+import com.app.backend.global.config.security.constant.AuthConstant;
 import com.app.backend.global.config.security.dto.response.ProviderDataDto;
 import com.app.backend.global.config.security.info.CustomUserDetails;
 import com.app.backend.global.config.security.util.AuthResponse;
@@ -63,10 +64,10 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
 		String accessToken = jwtProvider.createAccessToken(userDetails, jwtConfig.getACCESS_EXPIRATION());
 		String refreshToken = jwtProvider.createRefreshToken(userDetails, jwtConfig.getREFRESH_EXPIRATION());
 
-		redisTemplate.delete(userDetails.getUsername());
+		redisTemplate.delete(AuthConstant.REDIS_TOKEN_PREFIX + userDetails.getUserId());
 
 		redisTemplate.opsForValue().set(
-			userDetails.getUsername(),
+			AuthConstant.REDIS_TOKEN_PREFIX + userDetails.getUserId(),
 			refreshToken,
 			jwtConfig.getREFRESH_EXPIRATION(),
 			TimeUnit.MILLISECONDS

@@ -56,6 +56,15 @@ public class User extends BaseEntity {
 	@Column(nullable = false)
 	private LocalDate birthDate;
 
+	@Column(nullable = false)
+	private String zipCode;
+
+	@Column(nullable = false)
+	private String address;
+
+	@Column(nullable = false)
+	private String detailAddress;
+
 	@Builder.Default
 	@Enumerated(EnumType.STRING)
 	private Provider provider = Provider.LOCAL;
