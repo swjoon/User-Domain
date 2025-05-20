@@ -1,22 +1,20 @@
 package com.app.backend.global.config.security.handler;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.app.backend.global.config.security.config.JwtConfig;
 import com.app.backend.global.config.security.constant.AuthConstant;
-import com.app.backend.global.config.security.dto.response.ProviderDataDto;
 import com.app.backend.global.config.security.info.CustomUserDetails;
-import com.app.backend.global.config.security.util.AuthResponse;
-import com.app.backend.global.config.security.util.CookieProvider;
 import com.app.backend.global.config.security.util.JwtProvider;
-import com.app.backend.global.response.ApiResponse;
+import com.app.backend.global.util.UuidUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.ServletException;
@@ -29,6 +27,8 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @RequiredArgsConstructor
 public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler {
+
+	private static final String REDIRECT_URI = "http://localhost:3000/oauth2/callback";
 
 	private final ObjectMapper objectMapper;
 
@@ -46,40 +46,29 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
 		CustomUserDetails userDetails = (CustomUserDetails)authentication.getPrincipal();
 
 		if (userDetails.getNeedSignup()) {
-			ProviderDataDto data = ProviderDataDto.builder()
-				.uuid(userDetails.getUUID())
-				.provider(userDetails.getProvider())
-				.build();
+			String redirectUrl = UriComponentsBuilder.fromUriString(REDIRECT_URI)
+				.queryParam(AuthConstant.UUID, userDetails.getUUID())
+				.queryParam(AuthConstant.PROVIDER, userDetails.getProvider())
+				.build().toUriString();
 
-			AuthResponse.defaultResponse(
-				response,
-				ApiResponse.of(true, HttpStatus.OK, "추가정보를 기입해주세요.", data),
-				HttpStatus.OK.value(),
-				objectMapper
-			);
+			response.sendRedirect(redirectUrl);
 
 			return;
 		}
 
 		String accessToken = jwtProvider.createAccessToken(userDetails, jwtConfig.getACCESS_EXPIRATION());
-		String refreshToken = jwtProvider.createRefreshToken(userDetails, jwtConfig.getREFRESH_EXPIRATION());
 
-		redisTemplate.delete(AuthConstant.REDIS_TOKEN_PREFIX + userDetails.getUserId());
+		String uuid = UuidUtil.getUuid(LocalDate.now().toString() + userDetails.getUserId(), 7);
 
-		redisTemplate.opsForValue().set(
-			AuthConstant.REDIS_TOKEN_PREFIX + userDetails.getUserId(),
-			refreshToken,
-			jwtConfig.getREFRESH_EXPIRATION(),
-			TimeUnit.MILLISECONDS
-		);
+		redisTemplate.opsForValue()
+			.set(AuthConstant.OAUTH2_LOGIN_UUID_PREFIX + userDetails.getUserId(), uuid , 1, TimeUnit.MINUTES);
 
-		AuthResponse.successLogin(
-			response,
-			accessToken,
-			CookieProvider.createRefreshTokenCookie(refreshToken, jwtConfig.getREFRESH_EXPIRATION()),
-			HttpStatus.OK.value(),
-			ApiResponse.of(true, HttpStatus.OK, "로그인 성공"),
-			objectMapper
-		);
+		String redirectUrl = UriComponentsBuilder.fromUriString(REDIRECT_URI)
+			.queryParam(AuthConstant.ACCESS_TOKEN, accessToken)
+			.queryParam(AuthConstant.UUID, uuid)
+			.build()
+			.toUriString();
+
+		response.sendRedirect(redirectUrl);
 	}
 }
