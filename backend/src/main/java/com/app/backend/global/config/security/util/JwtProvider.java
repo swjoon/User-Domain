@@ -30,13 +30,13 @@ public class JwtProvider {
 		return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("id", Long.class);
 	}
 
-	public String getUsername(String token) {
+	public String getName(String token) {
 		return Jwts.parser()
 			.verifyWith(secretKey)
 			.build()
 			.parseSignedClaims(token)
 			.getPayload()
-			.get("username", String.class);
+			.get("name", String.class);
 	}
 
 	public String getRole(String token) {
@@ -77,10 +77,10 @@ public class JwtProvider {
 	public String createAccessToken(CustomUserDetails customUserDetails, long expiration) {
 		long currentTime = System.currentTimeMillis();
 
-		return "Bearer " + Jwts.builder()
+		return Jwts.builder()
 			.claim("subject", "access")
 			.claim("id", customUserDetails.getUserId())
-			.claim("username", customUserDetails.getUsername())
+			.claim("name", customUserDetails.getName())
 			.claim("role", customUserDetails.getRole())
 			.issuedAt(new Date(currentTime))
 			.expiration(new Date(currentTime + expiration))
