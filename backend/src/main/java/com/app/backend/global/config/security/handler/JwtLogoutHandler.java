@@ -36,7 +36,6 @@ public class JwtLogoutHandler implements LogoutHandler {
 			accessToken = authorization.substring(7);
 			try {
 				Long userId = jwtProvider.getUserId(accessToken);
-				String username = jwtProvider.getUsername(accessToken);
 				Date expiration = jwtProvider.getExpirationDate(accessToken);
 				long duration = expiration.getTime() - System.currentTimeMillis();
 
