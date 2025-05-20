@@ -17,6 +17,7 @@ import com.app.backend.domain.user.exception.UserException;
 import com.app.backend.global.config.security.config.JwtConfig;
 import com.app.backend.global.config.security.constant.AuthConstant;
 import com.app.backend.global.config.security.dto.request.LoginRequestDto;
+import com.app.backend.global.config.security.dto.response.LoginResponseDto;
 import com.app.backend.global.config.security.info.CustomUserDetails;
 import com.app.backend.global.config.security.util.AuthResponse;
 import com.app.backend.global.config.security.util.CookieProvider;
@@ -49,7 +50,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 		try {
 			LoginRequestDto loginRequest = objectMapper.readValue(request.getInputStream(), LoginRequestDto.class);
 
-			validateDto(loginRequest);
+			// validateDto(loginRequest);
 
 			String username = loginRequest.getUsername();
 			String password = loginRequest.getPassword();
@@ -78,7 +79,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
 		CustomUserDetails userDetails = (CustomUserDetails)authentication.getPrincipal();
 
-		String accessToken = jwtProvider.createAccessToken(userDetails, jwtConfig.getACCESS_EXPIRATION());
+		String accessToken = AuthConstant.ACCESS_TOKEN_PREFIX + jwtProvider.createAccessToken(userDetails,
+			jwtConfig.getACCESS_EXPIRATION());
 		String refreshToken = jwtProvider.createRefreshToken(userDetails, jwtConfig.getREFRESH_EXPIRATION());
 
 		redisTemplate.delete(AuthConstant.REDIS_TOKEN_PREFIX + userDetails.getUserId());
@@ -89,20 +91,22 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 			TimeUnit.MILLISECONDS
 		);
 
+		LoginResponseDto responseDto = new LoginResponseDto(userDetails.getUserId(), userDetails.getName());
+
 		AuthResponse.successLogin(
 			response,
 			accessToken,
 			CookieProvider.createRefreshTokenCookie(refreshToken, jwtConfig.getREFRESH_EXPIRATION()),
 			HttpStatus.OK.value(),
-			ApiResponse.of(true, HttpStatus.OK, "로그인 성공"),
+			ApiResponse.of(true, HttpStatus.OK, "로그인 성공", responseDto),
 			objectMapper);
 	}
 
-	private void validateDto(LoginRequestDto loginRequest) throws IOException {
-		Set<ConstraintViolation<LoginRequestDto>> violations = validator.validate(loginRequest);
-
-		if (!violations.isEmpty()) {
-			throw new UserException(GlobalErrorCode.INVALID_INPUT_VALUE);
-		}
-	}
+	// private void validateDto(LoginRequestDto loginRequest) throws IOException {
+	// 	Set<ConstraintViolation<LoginRequestDto>> violations = validator.validate(loginRequest);
+	//
+	// 	if (!violations.isEmpty()) {
+	// 		throw new UserException(GlobalErrorCode.INVALID_INPUT_VALUE);
+	// 	}
+	// }
 }

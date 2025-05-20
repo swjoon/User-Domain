@@ -89,17 +89,71 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 			return;
 		}
 
-		String username = jwtProvider.getUsername(accessToken);
+		String name = jwtProvider.getName(accessToken);
 		String role = jwtProvider.getRole(accessToken);
 		Long id = jwtProvider.getUserId(accessToken);
 
 		CustomUserDetails userDetails = new CustomUserDetails(
 			User.builder()
 				.id(id)
-				.username(username)
+				.name(name)
 				.role(Role.valueOf(role))
 				.build()
 		);
+
+		String refreshToken = jwtProvider.getRefreshToken(request);
+		String clientUUID = request.getHeader("X-UUID");
+
+		if (refreshToken == null) {
+			if (clientUUID == null) {
+				AuthResponse.failLogin(
+					response,
+					ApiResponse.of(false, HttpStatus.BAD_REQUEST, "탈취된 토큰으로 추정되어 로그인을 제한합니다."),
+					HttpStatus.BAD_REQUEST.value(),
+					objectMapper);
+				return;
+			}
+
+			Object savedUUID = redisTemplate.opsForValue().get(AuthConstant.OAUTH2_LOGIN_UUID_PREFIX + id);
+
+			if (savedUUID == null) {
+				AuthResponse.failLogin(
+					response,
+					ApiResponse.of(false, HttpStatus.BAD_REQUEST, "로그인 인증시간이 만료되었습니다."),
+					HttpStatus.BAD_REQUEST.value(),
+					objectMapper);
+				return;
+			}
+
+			if (!savedUUID.toString().equals(clientUUID)) {
+				AuthResponse.failLogin(
+					response,
+					ApiResponse.of(false, HttpStatus.BAD_REQUEST, "로그인 uuid 가 달라 로그인을 제한합니다."),
+					HttpStatus.BAD_REQUEST.value(),
+					objectMapper);
+				return;
+			}
+
+			Object savedRefreshToken = redisTemplate.opsForValue().get(AuthConstant.REDIS_TOKEN_PREFIX + id);
+
+			if (savedRefreshToken == null) {
+				String newRefreshToken = jwtProvider.createRefreshToken(userDetails, jwtConfig.getREFRESH_EXPIRATION());
+				redisTemplate.opsForValue().set(
+					AuthConstant.REDIS_TOKEN_PREFIX + id,
+					newRefreshToken,
+					jwtConfig.getREFRESH_EXPIRATION(),
+					TimeUnit.MILLISECONDS
+				);
+				response.addCookie(CookieProvider.createRefreshTokenCookie(newRefreshToken,
+					jwtConfig.getREFRESH_EXPIRATION()));
+			} else {
+				Long ttl = redisTemplate.getExpire(AuthConstant.REDIS_TOKEN_PREFIX + id, TimeUnit.MILLISECONDS);
+
+				response.addCookie(CookieProvider.createRefreshTokenCookie(savedRefreshToken.toString(), ttl));
+			}
+
+			redisTemplate.delete(AuthConstant.OAUTH2_LOGIN_UUID_PREFIX + id);
+		}
 
 		UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails,
 			null, userDetails.getAuthorities());
@@ -110,8 +164,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 	}
 
 	private void reissueFilter(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws
-		ServletException,
-		IOException {
+		ServletException, IOException {
 		String refreshToken = jwtProvider.getRefreshToken(request);
 
 		if (refreshToken == null) {
@@ -125,7 +178,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 		}
 
 		Long id = jwtProvider.getUserId(refreshToken);
-		String username = jwtProvider.getUsername(refreshToken);
+		String name = jwtProvider.getName(refreshToken);
 		String role = jwtProvider.getRole(refreshToken);
 
 		Object savedRefreshToken = redisTemplate.opsForValue().get(AuthConstant.REDIS_TOKEN_PREFIX + id);
@@ -144,12 +197,13 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 		CustomUserDetails userDetails = new CustomUserDetails(
 			User.builder()
 				.id(id)
-				.username(username)
+				.name(name)
 				.role(Role.valueOf(role))
 				.build()
 		);
 
-		String newAccessToken = jwtProvider.createAccessToken(userDetails, jwtConfig.getACCESS_EXPIRATION());
+		String newAccessToken = AuthConstant.ACCESS_TOKEN_PREFIX + jwtProvider.createAccessToken(userDetails,
+			jwtConfig.getACCESS_EXPIRATION());
 		String newRefreshToken = jwtProvider.createRefreshToken(userDetails, jwtConfig.getREFRESH_EXPIRATION());
 
 		redisTemplate.delete(AuthConstant.REDIS_TOKEN_PREFIX + userDetails.getUserId());
