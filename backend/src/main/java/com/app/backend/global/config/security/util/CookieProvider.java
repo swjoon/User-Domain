@@ -10,7 +10,7 @@ public class CookieProvider {
 	public static Cookie createRefreshTokenCookie(final String refreshToken, final long expiration) {
 		Cookie cookie = new Cookie(AuthConstant.REFRESH_TOKEN, refreshToken);
 		cookie.setHttpOnly(true);
-		cookie.setSecure(true);
+		cookie.setSecure(false);
 		cookie.setPath("/");
 		cookie.setMaxAge((int)(expiration / 1000));
 		return cookie;
