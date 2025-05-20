@@ -36,7 +36,9 @@ public class UserServiceImpl implements UserService {
 		User user = CreateUserLocalDto
 			.toEntity(requestDto, passwordEncoder.encode(requestDto.getPassword()));
 
-		return LoginResponseDto.from(userRepository.createUser(user));
+		User createdUser = userRepository.createUser(user);
+
+		return LoginResponseDto.from(createdUser.getId(), createdUser.getName());
 	}
 
 	@Override
