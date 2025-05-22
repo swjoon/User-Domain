@@ -82,8 +82,6 @@ public class SecurityConfig {
 			.cors(cors -> cors.configurationSource(corsConfig.corsConfigurationSource()))
 
 			.authorizeHttpRequests(auth -> auth
-				.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-
 				.requestMatchers(
 					"/h2-console/**",
 					"/api/v1/users/signup/**",
