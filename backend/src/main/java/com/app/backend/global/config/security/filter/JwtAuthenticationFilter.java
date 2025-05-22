@@ -1,7 +1,6 @@
 package com.app.backend.global.config.security.filter;
 
 import java.io.IOException;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.data.redis.core.RedisTemplate;
@@ -13,22 +12,20 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.app.backend.domain.user.exception.UserException;
 import com.app.backend.global.config.security.config.JwtConfig;
 import com.app.backend.global.config.security.constant.AuthConstant;
 import com.app.backend.global.config.security.dto.request.LoginRequestDto;
+import com.app.backend.global.config.security.dto.response.LoginResponseDto;
 import com.app.backend.global.config.security.info.CustomUserDetails;
 import com.app.backend.global.config.security.util.AuthResponse;
 import com.app.backend.global.config.security.util.CookieProvider;
 import com.app.backend.global.config.security.util.JwtProvider;
-import com.app.backend.global.error.exception.GlobalErrorCode;
 import com.app.backend.global.response.ApiResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 
@@ -48,8 +45,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
 		try {
 			LoginRequestDto loginRequest = objectMapper.readValue(request.getInputStream(), LoginRequestDto.class);
-
-			validateDto(loginRequest);
 
 			String username = loginRequest.getUsername();
 			String password = loginRequest.getPassword();
@@ -78,7 +73,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
 		CustomUserDetails userDetails = (CustomUserDetails)authentication.getPrincipal();
 
-		String accessToken = jwtProvider.createAccessToken(userDetails, jwtConfig.getACCESS_EXPIRATION());
+		String accessToken = AuthConstant.ACCESS_TOKEN_PREFIX + jwtProvider.createAccessToken(userDetails,
+			jwtConfig.getACCESS_EXPIRATION());
 		String refreshToken = jwtProvider.createRefreshToken(userDetails, jwtConfig.getREFRESH_EXPIRATION());
 
 		redisTemplate.delete(AuthConstant.REDIS_TOKEN_PREFIX + userDetails.getUserId());
@@ -89,20 +85,14 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 			TimeUnit.MILLISECONDS
 		);
 
+		LoginResponseDto responseDto = new LoginResponseDto(userDetails.getUserId(), userDetails.getName());
+
 		AuthResponse.successLogin(
 			response,
 			accessToken,
 			CookieProvider.createRefreshTokenCookie(refreshToken, jwtConfig.getREFRESH_EXPIRATION()),
 			HttpStatus.OK.value(),
-			ApiResponse.of(true, HttpStatus.OK, "로그인 성공"),
+			ApiResponse.of(true, HttpStatus.OK, "로그인 성공", responseDto),
 			objectMapper);
-	}
-
-	private void validateDto(LoginRequestDto loginRequest) throws IOException {
-		Set<ConstraintViolation<LoginRequestDto>> violations = validator.validate(loginRequest);
-
-		if (!violations.isEmpty()) {
-			throw new UserException(GlobalErrorCode.INVALID_INPUT_VALUE);
-		}
 	}
 }

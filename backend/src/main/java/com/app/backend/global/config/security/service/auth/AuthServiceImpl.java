@@ -46,7 +46,8 @@ public class AuthServiceImpl implements AuthService {
 
 			CustomUserDetails userDetails = new CustomUserDetails(user);
 
-			String accessToken = jwtProvider.createAccessToken(userDetails, jwtConfig.getACCESS_EXPIRATION());
+			String accessToken = AuthConstant.ACCESS_TOKEN_PREFIX + jwtProvider.createAccessToken(userDetails,
+				jwtConfig.getACCESS_EXPIRATION());
 
 			String refreshToken = jwtProvider.createRefreshToken(userDetails, jwtConfig.getREFRESH_EXPIRATION());
 
@@ -60,6 +61,8 @@ public class AuthServiceImpl implements AuthService {
 			LoginResponseDto responseDto = new LoginResponseDto(user.getId(), user.getName());
 
 			Cookie cookie = CookieProvider.createRefreshTokenCookie(refreshToken, jwtConfig.getREFRESH_EXPIRATION());
+
+			redisTemplate.delete(requestDto.getUuid());
 
 			AuthResponse.successLogin(
 				response,

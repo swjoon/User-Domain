@@ -13,10 +13,10 @@ public class LoginResponseDto {
 	private Long id;
 	private String name;
 
-	public static LoginResponseDto from(final User user) {
+	public static LoginResponseDto from(final Long id, final String name) {
 		return LoginResponseDto.builder()
-			.id(user.getId())
-			.name(user.getName())
+			.id(id)
+			.name(name)
 			.build();
 	}
 }

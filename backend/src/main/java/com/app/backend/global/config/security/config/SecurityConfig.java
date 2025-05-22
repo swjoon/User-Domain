@@ -3,6 +3,7 @@ package com.app.backend.global.config.security.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -13,7 +14,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.app.backend.global.config.security.filter.JwtAuthenticationFilter;
 import com.app.backend.global.config.security.filter.JwtAuthorizationFilter;
@@ -41,6 +41,7 @@ public class SecurityConfig {
 
 	private final JwtConfig jwtConfig;
 	private final JwtProvider jwtProvider;
+	private final CorsConfig corsConfig;
 
 	private final JwtLogoutHandler jwtLogoutHandler;
 	private final JwtLogoutSuccessHandler jwtLogoutSuccessHandler;
@@ -50,8 +51,6 @@ public class SecurityConfig {
 	private final CustomOAuth2FailureHandler customOAuth2FailureHandler;
 
 	private final CustomOAuth2UserService customOAuth2UserService;
-
-	private final UrlBasedCorsConfigurationSource corsConfigurationSource;
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationConfiguration configuration)
@@ -80,7 +79,7 @@ public class SecurityConfig {
 		http.headers(headers -> headers.frameOptions(option -> option.sameOrigin()))
 
 			.csrf(AbstractHttpConfigurer::disable)
-			.cors(cors -> cors.configurationSource(corsConfigurationSource))
+			.cors(cors -> cors.configurationSource(corsConfig.corsConfigurationSource()))
 
 			.authorizeHttpRequests(auth -> auth
 				.requestMatchers(
