@@ -1,7 +1,5 @@
 package com.app.backend.global.config.security.service.auth;
 
-import java.io.IOException;
-
 import com.app.backend.domain.user.dto.request.CreateUserOauth2Dto;
 
 import jakarta.servlet.http.HttpServletResponse;
