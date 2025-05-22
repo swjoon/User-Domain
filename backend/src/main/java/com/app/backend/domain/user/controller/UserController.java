@@ -37,7 +37,7 @@ public class UserController {
 
 		LoginResponseDto response = LoginResponseDto.from(userDetails.getUserId(), userDetails.getName());
 
-		return ApiResponse.of(true, HttpStatus.CREATED, "로그인을 완료했습니다.", response);
+		return ApiResponse.of(true, HttpStatus.OK, "로그인을 완료했습니다.", response);
 	}
 
 	@PostMapping("/signup")
